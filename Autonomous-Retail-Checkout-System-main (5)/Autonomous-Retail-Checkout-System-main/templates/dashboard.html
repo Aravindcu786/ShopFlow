@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Autonomous Retail AI – Live store surveillance dashboard.">
+    <title>Surveillance Dashboard – Autonomous Retail</title>
+    <!-- Tailwind CSS v3 via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-4 sm:px-8 py-3.5">
+        <div class="max-w-[1800px] mx-auto flex items-center justify-between">
+            <!-- Brand -->
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-white tracking-tight">Autonomous Retail</h1>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="flex items-center gap-3">
+                <a href="/admin" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700/60 text-slate-200 text-xs font-semibold transition-all hover:scale-105 active:scale-95">
+                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span>Admin Panel</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Viewport -->
+    <main class="flex-1 max-w-[1800px] w-full mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <!-- Dual Camera Video Viewports -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            
+            <!-- Camera 1: Entry / Exit Cam -->
+            <div class="glass-panel rounded-3xl p-6 border border-slate-800 shadow-2xl space-y-4 flex flex-col">
+                <div class="flex items-center justify-between px-1">
+                    <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2.5">
+                        <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                        Entry / Exit Cam
+                    </h2>
+                    <span id="badge_entry" class="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold tracking-wider uppercase flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                        LIVE
+                    </span>
+                </div>
+
+                <div class="relative w-full aspect-video min-h-[380px] sm:min-h-[460px] lg:min-h-[520px] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center shadow-inner">
+                    <img id="stream_entry" src="/video_feed_entry" alt="Entry / Exit Cam Stream" class="w-full h-full object-cover rounded-2xl">
+                    <div id="overlay_entry" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex-col items-center justify-center gap-3 p-6 text-center">
+                        <div class="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <p class="text-sm font-semibold text-slate-300">Connecting to Entry Camera...</p>
+                        <p class="text-xs text-slate-500">Waiting for stream or check configuration in Admin Panel</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Camera 2: Shelf Cam -->
+            <div class="glass-panel rounded-3xl p-6 border border-slate-800 shadow-2xl space-y-4 flex flex-col">
+                <div class="flex items-center justify-between px-1">
+                    <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2.5">
+                        <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                        Shelf View Cam
+                    </h2>
+                    <span id="badge_shelf" class="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold tracking-wider uppercase flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                        LIVE
+                    </span>
+                </div>
+
+                <div class="relative w-full aspect-video min-h-[380px] sm:min-h-[460px] lg:min-h-[520px] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center shadow-inner">
+                    <img id="stream_shelf" src="/video_feed_shelf" alt="Shelf Cam Stream" class="w-full h-full object-cover rounded-2xl">
+                    <div id="overlay_shelf" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex-col items-center justify-center gap-3 p-6 text-center">
+                        <div class="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                        <p class="text-sm font-semibold text-slate-300">Connecting to Shelf Camera...</p>
+                        <p class="text-xs text-slate-500">Waiting for stream or check configuration in Admin Panel</p>
+                    </div>
+                </div>
+
+                <!-- Real-Time Shelf Zone Matrix -->
+                <div class="mt-2 pt-4 border-t border-slate-800/80 flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-200">Shelf Zone Matrix</h3>
+                            <span class="text-[11px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-mono border border-slate-700/60">1 Compartment</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span id="matrix_status_badge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-semibold flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                Real-Time Vision Sync
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Shelf Compartment Matrix (Single Zone) -->
+                    <div id="shelf_matrix_grid" class="grid grid-cols-1 gap-3">
+                        <div id="card_zone_0" class="zone-card rounded-2xl p-3.5 bg-slate-900/90 border border-slate-800 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-h-[95px]">
+                            <div class="flex items-center gap-3">
+                                <span class="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30">Zone A</span>
+                                <div>
+                                    <div class="zone-name text-xs sm:text-sm font-bold text-white truncate max-w-[220px]" title="Apple (Fuji)">Apple (Fuji)</div>
+                                    <div class="zone-price text-sm sm:text-base font-extrabold text-emerald-400 font-mono mt-0.5">$2.50</div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3 sm:gap-4 text-xs pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800/80">
+                                <div class="flex items-center gap-1.5 text-slate-400">
+                                    <span>Detection:</span>
+                                    <span class="zone-detect font-mono text-slate-200">apple</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-slate-400">
+                                    <span>Confidence:</span>
+                                    <span class="zone-conf font-mono text-emerald-400 font-semibold">--</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-slate-500 font-mono text-[9px] sm:text-[10px]">
+                                    <span>Coordinates:</span>
+                                    <span class="zone-bbox">[200-600px]</span>
+                                </div>
+                                <span class="zone-badge px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>IN STOCK
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shelf Weight Sensor Status & Testing Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs">
+                        <div class="flex items-center gap-2 text-slate-300">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <span class="font-bold text-slate-200">Weight Sensor (SENSOR_001)</span>
+                            <span class="text-slate-500 font-mono text-[11px] hidden sm:inline">• Item Pickup requires YOLO Pose + Weight Change</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="triggerSimulatedWeight(-200)" id="btn_pickup" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 cursor-pointer" title="Simulate shelf weight decrease of 200g (Item pickup)">
+                                <span>⚖️ Trigger Weight Drop (-200g)</span>
+                            </button>
+                            <button type="button" onclick="triggerSimulatedWeight(200)" id="btn_putback" class="px-3 py-1.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 text-[11px] font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 cursor-pointer" title="Simulate shelf weight increase of 200g (Item put back)">
+                                <span>↩️ Put Back (+200g)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Resilient Stream Auto-Reconnect Logic & Real-Time Matrix Polling -->
+    <script>
+        function setupResilientStream(imgId, overlayId, endpoint) {
+            const img = document.getElementById(imgId);
+            const overlay = document.getElementById(overlayId);
+            if (!img) return;
+
+            let retryTimeout = null;
+
+            function onError() {
+                if (overlay) {
+                    overlay.classList.remove('hidden');
+                    overlay.classList.add('flex');
+                }
+                clearTimeout(retryTimeout);
+                retryTimeout = setTimeout(() => {
+                    img.src = endpoint + '?t=' + Date.now();
+                }, 1500);
+            }
+
+            function onLoad() {
+                if (overlay) {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                }
+            }
+
+            img.addEventListener('error', onError);
+            img.addEventListener('load', onLoad);
+        }
+
+        setupResilientStream('stream_entry', 'overlay_entry', '/video_feed_entry');
+        setupResilientStream('stream_shelf', 'overlay_shelf', '/video_feed_shelf');
+
+        // Real-Time Shelf Zone Matrix Polling
+        async function updateShelfMatrix() {
+            try {
+                const res = await fetch('/api/shelf_matrix');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data || !data.success || !data.matrix || !data.matrix.zones) return;
+
+                const zones = data.matrix.zones;
+                zones.forEach((z, idx) => {
+                    const card = document.getElementById(`card_zone_${idx}`);
+                    if (!card) return;
+
+                    const nameEl = card.querySelector('.zone-name');
+                    const priceEl = card.querySelector('.zone-price');
+                    const badgeEl = card.querySelector('.zone-badge');
+                    const detectEl = card.querySelector('.zone-detect');
+                    const confEl = card.querySelector('.zone-conf');
+                    const bboxEl = card.querySelector('.zone-bbox');
+
+                    if (nameEl) {
+                        nameEl.textContent = z.name || 'Product';
+                        nameEl.title = z.name || '';
+                    }
+                    if (priceEl) priceEl.textContent = z.price || '$0.00';
+                    if (bboxEl && z.bbox) bboxEl.textContent = `[${z.bbox[0]}-${z.bbox[2]}px]`;
+
+                    // Detection information
+                    if (z.detected_items && z.detected_items.length > 0) {
+                        const top = z.detected_items[0];
+                        if (detectEl) detectEl.textContent = top.label || 'object';
+                        if (confEl) confEl.textContent = `${Math.round(top.confidence * 100)}%`;
+                    } else {
+                        if (detectEl) detectEl.textContent = 'Monitoring';
+                        if (confEl) confEl.textContent = '--';
+                    }
+
+                    // Card borders and status pill based on zone state
+                    const state = z.state || 'AVAILABLE';
+                    card.className = "zone-card rounded-2xl p-3.5 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-h-[95px]";
+
+                    if (state === 'GRABBING' || state === 'INTERACTING') {
+                        card.classList.add('bg-amber-950/30', 'border-amber-400', 'shadow-md', 'shadow-amber-500/20');
+                        if (badgeEl) {
+                            badgeEl.className = "zone-badge px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1";
+                            badgeEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>INTERACTING';
+                        }
+                    } else if (state === 'REACHING') {
+                        card.classList.add('bg-amber-950/20', 'border-amber-500/50');
+                        if (badgeEl) {
+                            badgeEl.className = "zone-badge px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1";
+                            badgeEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>REACHING';
+                        }
+                    } else if (state === 'TAKEN') {
+                        card.classList.add('bg-emerald-950/30', 'border-emerald-400', 'shadow-md', 'shadow-emerald-500/20');
+                        if (badgeEl) {
+                            badgeEl.className = "zone-badge px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1";
+                            badgeEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>ITEM TAKEN';
+                        }
+                    } else if (state === 'DETECTED') {
+                        card.classList.add('bg-slate-900/90', 'border-emerald-500/40');
+                        if (badgeEl) {
+                            badgeEl.className = "zone-badge px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1";
+                            badgeEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>DETECTED';
+                        }
+                    } else {
+                        card.classList.add('bg-slate-900/90', 'border-slate-800');
+                        if (badgeEl) {
+                            badgeEl.className = "zone-badge px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1";
+                            badgeEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>IN STOCK';
+                        }
+                    }
+                });
+            } catch (e) {
+                // Ignore transient polling errors
+            }
+        }
+
+        setInterval(updateShelfMatrix, 750);
+        updateShelfMatrix();
+
+        // Simulate Weight Sensor load cell event for fusion testing
+        async function triggerSimulatedWeight(delta) {
+            try {
+                const btn = delta < 0 ? document.getElementById('btn_pickup') : document.getElementById('btn_putback');
+                if (btn) btn.classList.add('opacity-50', 'pointer-events-none');
+                const res = await fetch('/api/dev/weight-event', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        event_id: 'EVT_UI_' + Date.now(),
+                        sensor_id: 'SENSOR_001',
+                        weight_delta_g: delta
+                    })
+                });
+                const data = await res.json();
+                if (btn) btn.classList.remove('opacity-50', 'pointer-events-none');
+                updateShelfMatrix();
+            } catch (e) {
+                console.error('Weight event error:', e);
+            }
+        }
+    </script>
+</body>
+</html>
+

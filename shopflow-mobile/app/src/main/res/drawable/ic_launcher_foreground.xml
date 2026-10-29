@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Soft Drop Shadow below Bag -->
+    <path
+        android:fillColor="#33000000"
+        android:pathData="M54,80m-18,0a18,3 0 1,0 36,0a18,3 0 1,0 -36,0" />
+
+    <!-- Bag Handle -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M44,46 C44,34 64,34 64,46"
+        android:strokeWidth="4"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+
+    <!-- Bag Main Body -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M37,45 L71,45 C73.2,45 75,46.8 74.8,49 L72.5,73 C72.3,75.2 70.5,77 68.3,77 L39.7,77 C37.5,77 35.7,75.2 35.5,73 L33.2,49 C33,46.8 34.8,45 37,45 Z" />
+
+    <!-- Bag Top Fold / Flap Detail -->
+    <path
+        android:fillColor="#E0E7FF"
+        android:pathData="M37,45 L71,45 L69.5,49 L38.5,49 Z" />
+
+    <!-- Stylized "S" Flow Wave inside Bag -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M61,55 C53,52 46,55 46,60 C46,65 62,63 62,68 C62,73 55,75 47,73"
+        android:strokeWidth="3.2"
+        android:strokeColor="#4F46E5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Vibrant Sparkle Accent on top right of bag -->
+    <path
+        android:fillColor="#06B6D4"
+        android:pathData="M70,39 L71.5,43 L75.5,44.5 L71.5,46 L70,50 L68.5,46 L64.5,44.5 L68.5,43 Z" />
+
+</vector>

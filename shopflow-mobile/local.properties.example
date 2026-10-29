@@ -1,0 +1,18 @@
+## ShopFlow Local Environment Configuration Template
+## Copy this file to 'local.properties' and adjust for your local environment.
+## DO NOT commit 'local.properties' to git.
+
+# Location of the Android SDK on your local machine:
+# Windows example: sdk.dir=C\:\\Users\\<YourUsername>\\AppData\\Local\\Android\\Sdk
+# macOS example:   sdk.dir=/Users/<YourUsername>/Library/Android/sdk
+# Linux example:   sdk.dir=/home/<YourUsername>/Android/Sdk
+sdk.dir=
+
+# Backend API server URL:
+# For Android Emulator accessing localhost:
+# BASE_URL=http://10.0.2.2:5000
+# For physical device over Wi-Fi (replace with your development computer's LAN IP):
+# BASE_URL=http://192.168.1.100:5000
+# For production backend:
+# BASE_URL=https://api.shopflow.example.com
+BASE_URL=http://10.0.2.2:5000

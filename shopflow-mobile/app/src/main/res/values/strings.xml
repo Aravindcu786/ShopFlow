@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">ShopFlow</string>
+
+    <!-- Login Strings -->
+    <string name="login_title">Welcome Back!</string>
+    <string name="login_subtitle">Log in to your account to continue</string>
+    <string name="btn_login">Log In</string>
+    <string name="dont_have_account">Don\'t have an account? Register</string>
+
+    <!-- Register Strings -->
+    <string name="register_title">Create Account</string>
+    <string name="register_subtitle">Join ShopFlow today</string>
+    <string name="btn_register">Create Account</string>
+    <string name="already_registered">Already registered? Log In</string>
+
+    <!-- Field Labels & Hints -->
+    <string name="first_name">First Name</string>
+    <string name="first_name_hint">Enter first name</string>
+    <string name="last_name">Last Name</string>
+    <string name="last_name_hint">Enter last name</string>
+    <string name="email">Email</string>
+    <string name="email_hint">Enter your email</string>
+    <string name="password">Password</string>
+    <string name="password_hint">Enter password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="confirm_password_hint">Re-enter password</string>
+
+    <!-- Network Connectivity Strings -->
+    <string name="no_internet_title">No Internet Connection</string>
+    <string name="no_internet_message">ShopFlow requires an active internet connection to work. Please check your Wi-Fi or mobile network and try again.</string>
+    <string name="btn_retry">Try Again</string>
+    <string name="btn_network_settings">Network Settings</string>
+    <string name="toast_still_no_internet">No internet connection. Please check your settings.</string>
+    <string name="toast_internet_restored">Internet connection restored.</string>
+</resources>

@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/face_enrollment_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_bio_screen"
+    tools:context=".FaceEnrollmentActivity">
+
+    <!-- Top App Bar / Title -->
+    <FrameLayout
+        android:id="@+id/layoutHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="start|center_vertical"
+            android:background="@drawable/bg_bio_back_btn"
+            android:contentDescription="Back"
+            android:padding="10dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/bio_text_white" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvHeaderTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:text="Face Registration"
+                android:textColor="@color/bio_text_white"
+                android:textSize="19sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_shield_check" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="256-bit Encrypted Biometric ID"
+                    android:textColor="@color/bio_text_muted"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Stepper / Pose Indicators with Progress Bar -->
+    <LinearLayout
+        android:id="@+id/layoutPoseIndicators"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader">
+
+        <!-- 3 Segmented Pose Chips -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- Front Indicator (Active) -->
+            <TextView
+                android:id="@+id/tvPoseFront"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_bio_chip_active"
+                android:gravity="center"
+                android:paddingVertical="7dp"
+                android:text="1. Front  ●"
+                android:textColor="@color/bio_cyan"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <!-- Left Indicator (Pending) -->
+            <TextView
+                android:id="@+id/tvPoseLeft"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_bio_chip_pending"
+                android:gravity="center"
+                android:paddingVertical="7dp"
+                android:text="2. Left  ○"
+                android:textColor="@color/bio_text_muted"
+                android:textSize="13sp" />
+
+            <!-- Right Indicator (Pending) -->
+            <TextView
+                android:id="@+id/tvPoseRight"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_bio_chip_pending"
+                android:gravity="center"
+                android:paddingVertical="7dp"
+                android:text="3. Right  ○"
+                android:textColor="@color/bio_text_muted"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Visual Step Progress Bar -->
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressEnrollmentSteps"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_marginTop="8dp"
+            android:progress="33"
+            app:indicatorColor="@color/bio_cyan"
+            app:trackColor="@color/bio_card_stroke"
+            app:trackCornerRadius="2dp" />
+    </LinearLayout>
+
+    <!-- Camera Preview Container -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardCameraPreview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="28dp"
+        android:layout_marginTop="10dp"
+        app:cardBackgroundColor="@color/black"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="12dp"
+        app:strokeColor="@color/bio_stroke"
+        app:strokeWidth="2dp"
+        app:layout_constraintDimensionRatio="3:3.8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutPoseIndicators">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- CameraX PreviewView -->
+            <androidx.camera.view.PreviewView
+                android:id="@+id/viewCameraPreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!-- Animated Laser Scan Line -->
+            <View
+                android:id="@+id/viewScannerLaser"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@drawable/bg_scanner_laser" />
+
+            <!-- Dynamic Biometric Face Guide Oval Overlay -->
+            <View
+                android:id="@+id/viewFaceGuide"
+                android:layout_width="190dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_face_guide_oval_default" />
+
+            <!-- Capture Flash Feedback View -->
+            <View
+                android:id="@+id/viewCaptureFlash"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/bio_overlay_flash"
+                android:visibility="gone" />
+
+            <!-- Dynamic Floating Instruction Pill inside bottom of Viewfinder -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_bio_instruction_pill"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp">
+
+                <ImageView
+                    android:id="@+id/ivInstructionIcon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:contentDescription="Guidance"
+                    android:src="@drawable/ic_face_scan" />
+
+                <TextView
+                    android:id="@+id/tvInstruction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Look straight at camera"
+                    android:textColor="@color/bio_text_white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Modern Biometric Diagnostic HUD Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardStatusList"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="10dp"
+        app:cardBackgroundColor="@color/bio_surface"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="4dp"
+        app:strokeColor="@color/bio_card_stroke"
+        app:strokeWidth="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardCameraPreview">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <!-- Item 1: Detection -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_bio_hud_item"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="4dp">
+
+                <ImageView
+                    android:id="@+id/ivCheckFaceDetected"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="Face Detected Status"
+                    android:src="@drawable/ic_check" />
+
+                <TextView
+                    android:id="@+id/tvFaceDetectedLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="Face: OK"
+                    android:textColor="@color/bio_text_white"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Item 2: Position -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_bio_hud_item"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="4dp">
+
+                <ImageView
+                    android:id="@+id/ivCheckPosition"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="Position Status"
+                    android:src="@drawable/ic_check" />
+
+                <TextView
+                    android:id="@+id/tvPositionLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="Centered"
+                    android:textColor="@color/bio_text_white"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Item 3: Quality -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_bio_hud_item"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="4dp">
+
+                <ImageView
+                    android:id="@+id/ivCheckQuality"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="Quality Status"
+                    android:src="@drawable/ic_check" />
+
+                <TextView
+                    android:id="@+id/tvQualityLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="Optimal"
+                    android:textColor="@color/bio_text_white"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Uploading / Submitting Progress Indicator -->
+    <ProgressBar
+        android:id="@+id/progressBarEnrollment"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="10dp"
+        android:indeterminateTint="@color/bio_cyan"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardStatusList" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

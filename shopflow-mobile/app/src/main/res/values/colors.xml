@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Brand / Theme Colors -->
+    <color name="primary">#4F46E5</color>
+    <color name="primary_dark">#3730A3</color>
+    <color name="primary_light">#EEF2FF</color>
+    <color name="color_secondary">#06B6D4</color>
+
+    <!-- Neutral Colors -->
+    <color name="bg_light">#F8FAFC</color>
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_muted">#94A3B8</color>
+    <color name="input_stroke">#CBD5E1</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="error">#EF4444</color>
+    <color name="success">#10B981</color>
+
+    <!-- Biometric Premium Dark Colors -->
+    <color name="bio_bg">#090D16</color>
+    <color name="bio_bg_gradient_end">#0F172A</color>
+    <color name="bio_surface">#131C2E</color>
+    <color name="bio_surface_highlight">#1E293B</color>
+    <color name="bio_stroke">#334155</color>
+    <color name="bio_card_stroke">#1E293B</color>
+    <color name="bio_cyan">#06B6D4</color>
+    <color name="bio_cyan_dim">#164E63</color>
+    <color name="bio_cyan_glow">#3306B6D4</color>
+    <color name="bio_indigo">#6366F1</color>
+    <color name="bio_emerald">#10B981</color>
+    <color name="bio_emerald_glow">#3310B981</color>
+    <color name="bio_amber">#F59E0B</color>
+    <color name="bio_amber_glow">#33F59E0B</color>
+    <color name="bio_red">#EF4444</color>
+    <color name="bio_text_white">#F8FAFC</color>
+    <color name="bio_text_muted">#94A3B8</color>
+    <color name="bio_overlay_flash">#4DFFFFFF</color>
+</resources>

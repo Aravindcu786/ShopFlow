@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Exclude sensitive user session data and shared preferences from backup -->
+    <exclude domain="sharedpref" path="." />
+    <!-- Exclude databases if created -->
+    <exclude domain="database" path="." />
+    <!-- Exclude internal app files -->
+    <exclude domain="file" path="." />
+</full-backup-content>

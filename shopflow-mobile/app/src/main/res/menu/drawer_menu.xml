@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:id="@+id/group_home">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home"
+            android:title="Home" />
+    </group>
+
+    <item android:title="SHOPPING">
+        <menu>
+            <item
+                android:id="@+id/nav_cart"
+                android:icon="@drawable/ic_shopping_cart"
+                android:title="Current Cart" />
+            <item
+                android:id="@+id/nav_history"
+                android:icon="@drawable/ic_history"
+                android:title="Shopping History" />
+            <item
+                android:id="@+id/nav_payments"
+                android:icon="@drawable/ic_payment"
+                android:title="Payments &amp; Bills" />
+        </menu>
+    </item>
+
+    <item android:title="ACCOUNT">
+        <menu>
+            <item
+                android:id="@+id/nav_account"
+                android:icon="@drawable/ic_person"
+                android:title="Account" />
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="Settings" />
+        </menu>
+    </item>
+
+    <item android:title="SUPPORT">
+        <menu>
+            <item
+                android:id="@+id/nav_help"
+                android:icon="@drawable/ic_help"
+                android:title="Help &amp; Support" />
+        </menu>
+    </item>
+
+    <group android:id="@+id/group_logout">
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_logout"
+            android:title="Logout" />
+    </group>
+
+</menu>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESP32 Load Cell Tester</title>
+<style>
+  :root { color-scheme: light; --bg:#f3f6fb; --panel:#fff; --ink:#172033; --muted:#64748b; --accent:#2563eb; --line:#dbe3ef; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+  main { max-width:760px; margin:36px auto; padding:0 16px; }
+  .header { margin-bottom:22px; }
+  h1 { margin:0 0 8px; font-size:clamp(1.7rem,4vw,2.3rem); }
+  .sub { color:var(--muted); line-height:1.5; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:22px; box-shadow:0 8px 28px rgba(30,50,80,.06); margin:16px 0; }
+  .top { display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+  .status { display:inline-flex; align-items:center; gap:8px; color:var(--muted); font-size:.95rem; }
+  .dot { width:10px; height:10px; border-radius:50%; background:#94a3b8; }
+  .dot.live { background:#16a34a; }
+  button { border:0; border-radius:10px; padding:12px 16px; font:inherit; font-weight:650; cursor:pointer; }
+  button.primary { color:white; background:var(--accent); }
+  button.secondary { background:#e8eef8; color:#1e293b; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  .reading { text-align:center; padding:24px 8px 18px; }
+  .value { font-size:clamp(3rem,10vw,5rem); font-weight:750; letter-spacing:-.05em; line-height:1.05; overflow-wrap:anywhere; }
+  .unit { font-size:1.2rem; color:var(--muted); margin-top:8px; }
+  .bar { height:12px; background:#e8eef8; border-radius:999px; overflow:hidden; margin:18px 0 8px; }
+  .fill { height:100%; width:0%; background:linear-gradient(90deg,#60a5fa,#2563eb); border-radius:999px; transition:width .15s ease; }
+  .small { color:var(--muted); font-size:.9rem; line-height:1.5; }
+  .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  .metric { background:#f8faff; border:1px solid var(--line); border-radius:12px; padding:14px; }
+  .metric .label { color:var(--muted); font-size:.85rem; }
+  .metric .num { font-size:1.3rem; font-weight:700; margin-top:5px; }
+  label { display:block; font-weight:600; margin-bottom:8px; }
+  input, select { width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:10px; font:inherit; background:white; color:var(--ink); }
+  .controls { display:flex; gap:10px; flex-wrap:wrap; }
+  .controls button { flex:1; min-width:130px; }
+  #log { max-height:160px; overflow:auto; background:#101827; color:#dbeafe; border-radius:10px; padding:12px; font: .82rem ui-monospace,SFMono-Regular,Consolas,monospace; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .warning { background:#fff7ed; border:1px solid #fed7aa; padding:12px 14px; border-radius:12px; color:#9a3412; line-height:1.5; font-size:.92rem; }
+  @media (max-width:520px) { .grid { grid-template-columns:1fr 1fr; } .panel { padding:16px; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="header">
+    <h1>ESP32 Load Cell Tester</h1>
+    <div class="sub">Live weight dashboard for your ESP32 + HX711 load cell. Reads the text printed by your Arduino sketch over USB serial.</div>
+  </div>
+
+  <div class="warning">
+    Before connecting, close Arduino IDE's <b>Serial Monitor</b> and <b>Serial Plotter</b> because only one app can use the ESP32 COM port at a time.
+  </div>
+
+  <section class="panel">
+    <div class="top">
+      <div class="status"><span id="dot" class="dot"></span><span id="status">Not connected</span></div>
+      <div class="controls" style="flex:0 1 310px">
+        <button id="connect" class="primary">Connect ESP32</button>
+        <button id="disconnect" class="secondary" disabled>Disconnect</button>
+      </div>
+    </div>
+    <div class="reading">
+      <div id="weight" class="value">--.--</div>
+      <div id="unit" class="unit">grams</div>
+      <div class="bar"><div id="fill" class="fill"></div></div>
+      <div class="small">Live reading from the HX711</div>
+    </div>
+    <div class="grid">
+      <div class="metric"><div class="label">Weight in grams</div><div id="grams" class="num">—</div></div>
+      <div class="metric"><div class="label">Weight in kilograms</div><div id="kg" class="num">—</div></div>
+      <div class="metric"><div class="label">Last update</div><div id="updated" class="num">—</div></div>
+      <div class="metric"><div class="label">Readings received</div><div id="count" class="num">0</div></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <label for="maxRange">Gauge maximum (grams)</label>
+    <input id="maxRange" type="number" min="1" step="any" value="5000">
+    <p class="small">Set this to your load cell's rated capacity to scale the blue bar. This does not change the ESP32 calibration.</p>
+    <div class="controls">
+      <button id="zero" class="secondary" disabled>Zero display</button>
+      <button id="clear" class="secondary">Clear log</button>
+    </div>
+    <p class="small">“Zero display” subtracts the current reading in this webpage only. To tare the actual scale, remove all weight and restart the ESP32, or add a tare command to the Arduino sketch.</p>
+  </section>
+
+  <section class="panel">
+    <div class="top"><h2 style="font-size:1.1rem;margin:0 0 12px">Serial log</h2><span class="small">Expected format: <code>Weight: 125.40 grams</code></span></div>
+    <div id="log">Waiting for serial data…</div>
+    <p class="small">If the page connects but no weight appears, check that your sketch prints a line containing “Weight:” and that its baud rate is 115200.</p>
+  </section>
+</main>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let port = null, reader = null, keepReading = false, buffer = "";
+  let latestRaw = null, displayZero = 0, count = 0;
+  const logLines = [];
+
+  function setStatus(message, connected) {
+    $("status").textContent = message;
+    $("dot").classList.toggle("live", !!connected);
+    $("connect").disabled = !!connected;
+    $("disconnect").disabled = !connected;
+    $("zero").disabled = !connected || latestRaw === null;
+  }
+  function log(message) {
+    const stamp = new Date().toLocaleTimeString();
+    logLines.push(`[${stamp}] ${message}`);
+    while (logLines.length > 30) logLines.shift();
+    $("log").textContent = logLines.join("\n");
+    $("log").scrollTop = $("log").scrollHeight;
+  }
+  function showWeight(raw) {
+    latestRaw = raw;
+    const adjusted = raw - displayZero;
+    $("weight").textContent = adjusted.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+    $("grams").textContent = adjusted.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + " g";
+    $("kg").textContent = (adjusted / 1000).toLocaleString(undefined, {minimumFractionDigits:4, maximumFractionDigits:4}) + " kg";
+    $("unit").textContent = "grams";
+    $("updated").textContent = new Date().toLocaleTimeString();
+    const max = Math.max(1, Number($("maxRange").value) || 5000);
+    $("fill").style.width = Math.max(0, Math.min(100, adjusted / max * 100)) + "%";
+    $("count").textContent = String(count);
+    $("zero").disabled = false;
+  }
+  function parseLine(line) {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    log(trimmed);
+    // Matches e.g. "Weight: 125.40 grams" and negative values.
+    const match = trimmed.match(/Weight\s*:\s*(-?\d+(?:\.\d+)?)/i);
+    if (match) {
+      const value = Number(match[1]);
+      if (Number.isFinite(value)) {
+        count++;
+        showWeight(value);
+        $("count").textContent = String(count);
+      }
+    } else if (/HX711 not found/i.test(trimmed)) {
+      setStatus("Connected, but HX711 not found", true);
+    }
+  }
+  async function readLoop() {
+    keepReading = true;
+    const decoder = new TextDecoder();
+    try {
+      while (port && port.readable && keepReading) {
+        reader = port.readable.getReader();
+        try {
+          while (keepReading) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            if (value) {
+              buffer += decoder.decode(value, {stream:true});
+              const lines = buffer.split(/\r?\n/);
+              buffer = lines.pop() || "";
+              lines.forEach(parseLine);
+            }
+          }
+        } finally {
+          reader.releaseLock();
+          reader = null;
+        }
+      }
+    } catch (err) {
+      if (keepReading) log("Serial read error: " + err.message);
+    }
+  }
+  $("connect").addEventListener("click", async () => {
+    if (!("serial" in navigator)) {
+      alert("Web Serial is not supported in this browser. Please use desktop Google Chrome or Microsoft Edge.");
+      return;
+    }
+    try {
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 115200 });
+      setStatus("Connected — waiting for weight data", true);
+      log("Connected at 115200 baud.");
+      readLoop();
+    } catch (err) {
+      port = null;
+      setStatus("Not connected", false);
+      if (err.name !== "NotFoundError") alert("Could not connect: " + err.message);
+    }
+  });
+  $("disconnect").addEventListener("click", async () => {
+    keepReading = false;
+    try {
+      if (reader) await reader.cancel();
+      if (port) await port.close();
+    } catch (err) { log("Disconnect note: " + err.message); }
+    port = null; reader = null; buffer = "";
+    setStatus("Disconnected", false);
+    log("Disconnected.");
+  });
+  $("zero").addEventListener("click", () => {
+    if (latestRaw !== null) {
+      displayZero = latestRaw;
+      showWeight(latestRaw);
+      log("Webpage display zeroed. Hardware scale calibration unchanged.");
+    }
+  });
+  $("clear").addEventListener("click", () => {
+    logLines.length = 0;
+    $("log").textContent = "Log cleared.";
+  });
+  $("maxRange").addEventListener("input", () => { if (latestRaw !== null) showWeight(latestRaw); });
+  navigator.serial?.addEventListener("disconnect", () => {
+    setStatus("USB device disconnected", false);
+    port = null; keepReading = false;
+  });
+})();
+</script>
+</body>
+</html>
